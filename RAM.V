@@ -1,5 +1,5 @@
 module RAM_Sync_Single_port (din,rx_valid,clk,rst_n,dout,tx_valid);
-	
+
 
 	parameter MEM_DEPTH = 256;
 	parameter ADDR_SIZE = 8;
@@ -15,31 +15,36 @@ module RAM_Sync_Single_port (din,rx_valid,clk,rst_n,dout,tx_valid);
 
 	always @(posedge clk) begin
 		if (!rst_n) begin
-			dout<=0;
-			tx_valid<=0;
-		end
-		else 
-			case(din[9:8])
+			dout <= 0;
+			tx_valid <= 0;
+		end else begin
+			case (din[9:8])
+				2'b00: begin
+					if (rx_valid) begin
+						addr_wr <= din[7:0];
+						tx_valid <= 0;
+					end
+				end
 
-			2'b00: if(rx_valid)begin 
-						addr_wr<=din[7:0];
-						tx_valid<=0;
-				   end
+				2'b01: begin
+					if (rx_valid) begin
+						mem[addr_wr] <= din[7:0];
+						tx_valid <= 0;
+					end
+				end
 
-			2'b01: if(rx_valid)begin  
-						mem[addr_wr]<=din[7:0];
-						tx_valid<=0;
-				   end
+				2'b10: begin
+					if (rx_valid) begin
+						addr_rd <= din[7:0];
+						tx_valid <= 0;
+					end
+				end
 
-			2'b10: if(rx_valid)begin 
-					addr_rd<=din[7:0];
-					tx_valid<=0;
-				   end 
-
-			2'b11: begin
-					dout<=mem[addr_rd];
-				    tx_valid<=1;
-				   end
+				2'b11: begin
+					dout <= mem[addr_rd];
+					tx_valid <= 1;
+				end
 			endcase
+		end
 	end
 endmodule

@@ -1,5 +1,4 @@
 module SPI_Wrapper_tb();
-	
 	parameter IDLE = 3'b000;
 	parameter CHK_CMD = 3'b001;
 	parameter WRITE = 3'b010;
@@ -9,20 +8,25 @@ module SPI_Wrapper_tb();
 	reg MOSI,SS_n,clk,rst_n;
 	wire MISO_dut;
 	reg tmp;
-	
 
-	SPI_Wrapper #(.IDLE(IDLE),.CHK_CMD(CHK_CMD),.WRITE(WRITE),.READ_ADD(READ_ADD),.READ_DATA(READ_DATA)) DUT (MOSI,SS_n,clk,rst_n,MISO_dut);
+	SPI_Wrapper #(
+		.IDLE(IDLE),
+		.CHK_CMD(CHK_CMD),
+		.WRITE(WRITE),
+		.READ_ADD(READ_ADD),
+		.READ_DATA(READ_DATA)
+	) DUT (MOSI, SS_n, clk, rst_n, MISO_dut);
 
 	initial begin
-		clk=0;
-		forever 
-		#1 clk=~clk;
+		clk = 0;
+		forever
+			#1 clk = ~clk;
 	end
 
 	integer i;
-	initial begin 
-		rst_n=0;
-		SS_n=1;
+	initial begin
+		rst_n = 0;
+		SS_n = 1;
 
 		@(negedge clk);
 
@@ -31,13 +35,12 @@ module SPI_Wrapper_tb();
 			$stop;
 		end
 
-		rst_n=1;
-		SS_n=0;
-        
+		rst_n = 1;
+		SS_n = 0;
 
 		@(negedge clk);
 
-		repeat(3)begin
+		repeat (3) begin
 			MOSI = 0;
 			@(negedge clk);
 		end
@@ -47,47 +50,45 @@ module SPI_Wrapper_tb();
 			@(negedge clk);
 		end
 
-		SS_n=1;
-		tmp=0;
+		SS_n = 1;
+		tmp = 0;
 		@(negedge clk);
 
-		for (i = 0; i<10000 ; i=i+1 ) begin
+		for (i = 0; i < 10000; i = i + 1) begin
 
-			tmp=~tmp;
+			tmp = ~tmp;
 			SS_n = 0;
-            @(negedge clk) ;
+			@(negedge clk);
 
-            repeat(2) begin
-                    MOSI = 0;
-                    @(negedge clk);
-                end
-            
-            if (tmp) begin
-                MOSI = 1;
-                @(negedge clk);
-            end
-            else begin
-                MOSI = 0;
-                @(negedge clk);
-            end
+ 			repeat (2) begin
+				MOSI = 0;
+				@(negedge clk);
+			end
 
-            repeat(8) begin
-             	MOSI = $random;
-                @(negedge clk);
-                end
+			if (tmp) begin
+				MOSI = 1;
+				@(negedge clk);
+			end else begin
+				MOSI = 0;
+				@(negedge clk);
+			end
 
-            SS_n = 1;
-            @(negedge clk);
+			repeat (8) begin
+				MOSI = $random;
+				@(negedge clk);
+			end
 
-        end
+			SS_n = 1;
+			@(negedge clk);
 
-        SS_n=0;
-        
+ 		end
+
+		SS_n = 0;
 
 		@(negedge clk);
 
-		repeat(2)begin
-			MOSI = 1 ;
+		repeat (2) begin
+			MOSI = 1;
 			@(negedge clk);
 		end
 
@@ -99,49 +100,48 @@ module SPI_Wrapper_tb();
 			@(negedge clk);
 		end
 
-		SS_n=1;
-		tmp=0;
+		SS_n = 1;
+		tmp = 0;
 		@(negedge clk);
 
-		for (i = 0; i<10000 ; i=i+1 ) begin
+		for (i = 0; i < 10000; i = i + 1) begin
 
-			tmp=~tmp;
+			tmp = ~tmp;
 			SS_n = 0;
-            @(negedge clk) ;
+			@(negedge clk);
 
-            repeat(2) begin
-                    MOSI = 1;
-                    @(negedge clk);
-                end
-            
-            if (tmp) begin
-                MOSI = 1;
-                @(negedge clk);
-            end
-            else begin
-                MOSI = 0;
-                @(negedge clk);
-            end
+ 			repeat (2) begin
+				MOSI = 1;
+				@(negedge clk);
+			end
 
-            repeat(8) begin
-             	MOSI = $random;
-                @(negedge clk);
-                end
+ 			if (tmp) begin
+				MOSI = 1;
+				@(negedge clk);
+			end else begin
+				MOSI = 0;
+				@(negedge clk);
+			end
 
-            if (tmp)begin
-            	repeat(8)
-            		@(negedge clk);
+			repeat (8) begin
+				MOSI = $random;
+				@(negedge clk);
+			end
+
+			if (tmp) begin
+				repeat (8)
+					@(negedge clk);
             end
 
             @(negedge clk);
             SS_n = 1;
             @(negedge clk);
 
-        end		
+		end
 
 		$display("output is %b",MISO_dut);
 
-	$stop;
+		$stop;
 	end
 endmodule
 
